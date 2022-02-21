@@ -11,11 +11,8 @@ from discord_components import * # Button, ButtonStyle, Select, SelectOption, Di
 # from dislash import InteractionClient, ActionRow, Button, ButtonStyle, SelectMenu, SelectOption
 # from PIL import Image, ImageFont, ImageDraw
 
-import io
 import asyncio
-import sqlite3
 import datetime
-import os
 
 from discord_slash import SlashCommand, SlashContext
 from discord_slash.utils.manage_commands import create_choice, create_option
