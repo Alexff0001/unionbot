@@ -176,36 +176,89 @@ async def mute(ctx, user: discord.Member = None, time: int = None, *, reason = N
                 if user.top_role.position >= ctx.author.top_role.position:
                     em0 = discord.Embed(
                         title = 'Ошибка!',
-                        description = 'Ты не имеешь права выдать роль как у тебя или выше!',
+                        description = 'У тебя нет прав!',
                         timestamp = datetime.datetime.utcnow()
                     )
                     em0.set_thumbnail(url = ctx.guild.icon_url)
-                    em0.set_footer(text = 'Famq&News Bot')
+                    em0.set_footer(text = 'UnionShop Bot')
                     
-                    await ctx.reply('Ты не имеешь права замутить пользователя с ролью, как или выше чем у тебя!')
+                    await ctx.reply(embed = em0)
                 else:
                     role = user.guild.get_role(942828699244453975)
+                    if role in user.roles:
+                        em0 = discord.Embed(
+                            title = 'Ошибка!',
+                            description = 'Пользователь уже замучен!',
+                            timestamp = datetime.datetime.utcnow()
+                        )
+                        em0.set_thumbnail(url = ctx.guild.icon_url)
+                        em0.set_footer(text = 'UnionShops Bot')
+                        await ctx.reply(embed = em0)
+                    else:
+                        em = discord.Embed(
+                            title = 'Пользователь замучен',
+                            description = f'{user.mention} получил мут\nВремя: **{time}** час/а/ов\nПричина: **{reason}**',
+                            color = discord.Color.from_rgb(127,255,212)
+                        )
+                        em.set_footer(text = 'UnionShop Bot')
+                        em.timestamp = datetime.datetime.utcnow()
+                        
+                        await ctx.reply(embed = em) 
+                        await user.add_roles(role) 
+                        await asyncio.sleep(time)
+                        await user.remove_roles(role)
+                        embed = discord.Embed(
+                            title = 'Время мута истекло!',
+                            description = f'{user.mention} пробыл в муте **{time}** часа(ов) по причине: **{reason}**',
+                            color = discord.Color.from_rgb(135,206,250)
+                        )
+                        embed.set_footer(text = 'UnionShop Bot')
+                        embed.timestamp = datetime.datetime.utcnow()
+                        await ctx.send(embed = embed)
 
+
+@bot.command(aliases = ['размут'])
+@commands.has_any_role(942828699475132432, 942828699475132429, 942828699475132426)
+async def unmute(ctx, user: discord.Member = None, *, reason = None): 
+    if user is None:
+        await ctx.reply('Укажи пользователя, которого хочешь размутить!')
+    else:
+        if reason is None:
+            await ctx.reply('Укажи причину по которой следует размутить пользователя!') 
+        else:
+            if user.top_role.position >= ctx.author.top_role.position:
+                em0 = discord.Embed(
+                    title = 'Ошибка!',
+                    description = 'У тебя нет прав!',
+                    timestamp = datetime.datetime.utcnow()
+                )
+                em0.set_thumbnail(url = ctx.guild.icon_url)
+                em0.set_footer(text = 'UnionShops Bot')
+                
+                await ctx.reply(embed = em0)
+            else:
+                role = user.guild.get_role(942828699244453975)
+                if role not in user.roles:
+                    em0 = discord.Embed(
+                        title = 'Ошибка!',
+                        description = 'Пользователь не был замучен!',
+                        timestamp = datetime.datetime.utcnow()
+                    )
+                    em0.set_thumbnail(url = ctx.guild.icon_url)
+                    em0.set_footer(text = 'UnionShops Bot')
+                    await ctx.reply(embed = em0)
+                else:
+                    role1 = user.guild.get_role(942828699244453975)
                     em = discord.Embed(
-                        title = 'Пользователь замучен',
-                        description = f'{user.mention} получил мут\nВремя: **{time}** час/а/ов\nПричина: **{reason}**',
+                        title = 'Пользователь размучен',
+                        description = f'{user.mention} размучен\nПричина: **{reason}**',
                         color = discord.Color.from_rgb(127,255,212)
                     )
                     em.set_footer(text = 'UnionShop Bot')
                     em.timestamp = datetime.datetime.utcnow()
                     
-                    await ctx.reply(embed = em) 
-                    await user.add_roles(role) 
-                    await asyncio.sleep(3600 * time)
-                    await user.remove_roles(role)
-                    embed = discord.Embed(
-                        title = 'Время мута истекло!',
-                        description = f'{user.mention} пробыл в муте **{time}** часа(ов) по причине: **{reason}**',
-                        color = discord.Color.from_rgb(135,206,250)
-                    )
-                    embed.set_footer(text = 'UnionShop Bot')
-                    embed.timestamp = datetime.datetime.utcnow()
-                    await ctx.send(embed = embed)
+                    await user.remove_roles(role1)
+                    await ctx.reply(embed = em)
 
 
 @slash.slash(
@@ -306,7 +359,7 @@ async def mute(ctx: SlashContext, user: str, time: int, *, reason: str):
                     em0.set_footer(text = 'UnionShop Bot')
                     
                     await ctx.reply(embed = em0, hidden = True)
-                elif owner or admin or moder not in ctx.author.roles:
+                elif owner or moder not in ctx.author.roles is not None:
                     em1 = discord.Embed(
                         title = 'Ошибка!',
                         description = 'Ты не имеешь права использовать эту команду!',
@@ -341,5 +394,35 @@ async def mute(ctx: SlashContext, user: str, time: int, *, reason: str):
                     await ctx.reply(embed = embed)
                     
 
+@bot.event
+async def on_member_join(member):
+    embed1 = discord.Embed(
+        title = 'Пользователь присоединился',
+        description = f'{member.mention} {len(list(member.guild.members))} по счёту на сервере\nАккаунт создан ' + f"{member.created_at.strftime('%d %B %Yг.')}",
+        color = discord.Color.from_rgb(244, 127, 255)
+        )
+    embed1.set_author(name = f'{member}', icon_url = member.avatar_url)
+    embed1.set_footer(text = f'ID: {member.id}')
+    embed1.timestamp = datetime.datetime.utcnow()
+    await bot.get_channel(942828703266783339).send(embed = embed1)
+
+
+@bot.event
+async def on_member_remove(member):
+    rlist = []  
+    for role in member.roles:
+      if role.name != "@everyone":
+        rlist.append(role.mention)
+
+    b = ", ".join(rlist)
+    embed = discord.Embed(
+        title = 'Пользователь вышел с сервера',
+        description = f'{member.mention} зашёл на этот сервер ' + f"{member.joined_at.strftime('%d %B %Yг.')}\n" + f"**Роли({len(rlist)}):**" + ''.join([b]),
+        color = discord.Color.from_rgb(255, 0, 0)
+        )
+    embed.set_author(name = f'{member}', icon_url = member.avatar_url)
+    embed.set_footer(text = f'ID: {member.id}')
+    embed.timestamp = datetime.datetime.utcnow()
+    await bot.get_channel(942828703266783339).send(embed = embed)
 
 bot.run('OTMyNzA3ODI0ODY4NDA1MzA4.YeW52g.bHCuznd8jXPxYdHELZi4pY_xP4g')
