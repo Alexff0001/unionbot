@@ -205,7 +205,7 @@ async def mute(ctx, user: discord.Member = None, time: int = None, *, reason = N
                         
                         await ctx.reply(embed = em) 
                         await user.add_roles(role) 
-                        await asyncio.sleep(time)
+                        await asyncio.sleep(3600 * time)
                         await user.remove_roles(role)
                         embed = discord.Embed(
                             title = 'Время мута истекло!',
