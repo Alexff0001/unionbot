@@ -425,4 +425,120 @@ async def on_member_remove(member):
     embed.timestamp = datetime.datetime.utcnow()
     await bot.get_channel(942828703266783339).send(embed = embed)
 
+
+@bot.command(pass_context = True, aliases = ['очистить'])
+@commands.has_any_role(942828699475132432, 942828699475132429, 942828699475132428)
+async def clear(ctx, amount = 25):
+    await ctx.channel.purge(limit = int(amount) + 1)
+    
+    author = str(ctx.author)
+    embed = discord.Embed(
+        title = 'Сообщения удалены!',
+        color = discord.Color.from_rgb(244, 127, 255)
+        )
+    embed.add_field(name = 'Количество', value = amount, inline = False)
+    embed.set_footer(text = 'Модератор: ' + author)
+    await ctx.send(embed = embed, delete_after = 5)
+    
+    channel = bot.get_channel(942828703266783339)
+    embed1 = discord.Embed(
+        title = 'Сообщения удалены!',
+        color = discord.Color.from_rgb(255, 0, 0)
+        )
+    embed1.add_field(name = 'Количество', value = amount, inline = True)
+    embed1.set_footer(text = 'Модератор: ' + author)
+    await channel.send(embed = embed1)
+
+
+@bot.command(aliases = ['бан'])
+@commands.has_any_role(942828699475132432, 942828699475132429, 942828699475132428)
+async def ban(ctx, member: discord.Member = None, *, reason = 'Не указана'):
+    if member is None:
+        embed0 = discord.Embed(
+            description = 'Укажи пользователя, которого хочешь забанить!',
+            color = discord.Color.from_rgb(255, 0, 0)
+            )
+        embed0.set_footer(text = 'UnionShop Bot')
+        embed0.timestamp = datetime.datetime.utcnow()
+        await ctx.reply(embed = embed0)
+    
+    elif member is ctx.author:
+        embed1 = discord.Embed(
+            description = 'Ты не можешь забанить самого себя..!',
+            color = discord.Color.from_rgb(255, 0, 0)
+            )
+        embed1.set_footer(text = 'UnionShop Bot')
+        embed1.timestamp = datetime.datetime.utcnow()
+        await ctx.reply(embed = embed1)
+   
+    elif member != ctx.author:
+        channel = bot.get_channel(942828703266783339)
+        em = discord.Embed(
+            title = 'Пользователь был забанен!',
+            description = f'**Пользователь:** {member.mention}',
+            color = discord.Color.from_rgb(255, 0, 0)
+            )
+        em.add_field(name = 'ID', value = member.id, inline = True)
+        em.add_field(name = 'Причина', value = reason, inline = True)
+        em.add_field(name = 'Модератор', value = f'{ctx.author.mention} {ctx.author}', inline = True)
+        em.set_footer(text = 'UnionShop Bot')
+        em.timestamp = datetime.datetime.utcnow()
+        
+        embed = discord.Embed(
+            description = 'Пользователь забанен!',
+            color = discord.Color.from_rgb(244, 127, 255)
+            )
+        embed.set_footer(text = 'UnionShop Bot')
+        embed.timestamp = datetime.datetime.utcnow()
+        await member.ban(reason = reason)
+        await ctx.reply(embed = embed)
+        await channel.send(embed = em)
+    
+
+
+@bot.command(aliases = ['кик'])
+@commands.has_any_role(942828699475132432, 942828699475132429, 942828699475132428)
+async def kick(ctx, member: discord.Member = None, *, reason = 'Не указана'):
+    if member is None:
+        embed0 = discord.Embed(
+            description = 'Укажи пользователя, которого хочешь кикнуть!',
+            color = discord.Color.from_rgb(255, 0, 0)
+            )
+        embed0.set_footer(text = 'UnionShop Bot')
+        embed0.timestamp = datetime.datetime.utcnow()
+        await ctx.reply(embed = embed0)
+    
+    elif member is ctx.author:
+        embed1 = discord.Embed(
+            description = 'Ты не можешь кикнуть самого себя..!',
+            color = discord.Color.from_rgb(255, 0, 0)
+            )
+        embed1.set_footer(text = 'UnionShop Bot')
+        embed1.timestamp = datetime.datetime.utcnow()
+        await ctx.reply(embed = embed1)
+    
+    elif member != ctx.author:
+        channel = bot.get_channel(942828703266783339)
+        em = discord.Embed(
+            title = 'Пользователь был кикнут!',
+            description = f'**Пользователь:** {member.mention}',
+            color = discord.Color.from_rgb(255, 0, 0)
+            )
+        em.add_field(name = 'ID', value = member.id, inline = True)
+        em.add_field(name = 'Причина', value = reason, inline = True)
+        em.add_field(name = 'Модератор', value = f'{ctx.author.mention} {ctx.author}', inline = True)
+        em.set_footer(text = 'UnionShop Bot')
+        em.timestamp = datetime.datetime.utcnow()
+
+        embed = discord.Embed(
+            description = 'Пользователь кикнут!',
+            color = discord.Color.from_rgb(244, 127, 255)
+            )
+        embed.set_footer(text = 'UnionShop Bot')
+        embed.timestamp = datetime.datetime.utcnow()
+        await member.kick(reason = reason)
+        await ctx.reply(embed = embed)
+        await channel.send(embed = em)
+
+
 bot.run('OTMyNzA3ODI0ODY4NDA1MzA4.YeW52g.bHCuznd8jXPxYdHELZi4pY_xP4g')
